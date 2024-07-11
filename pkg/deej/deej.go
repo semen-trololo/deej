@@ -147,37 +147,37 @@ func (d *Deej) run() {
 		var flag bool = true
 		for {
 		
-		if err := d.serial.Start(); err != nil && flag == true {
-			d.logger.Warnw("Failed to start first-time serial connection", "error", err)
+			if err := d.serial.Start(); err != nil {
+				d.logger.Warnw("Failed to start first-time serial connection", "error", err)
 
 			// If the port is busy, that's because something else is connected - notify and quit
-			if errors.Is(err, os.ErrPermission) {
-				d.logger.Warnw("Serial port seems busy, notifying user",
-					"comPort", d.config.ConnectionInfo.COMPort)
+				if errors.Is(err, os.ErrPermission) && flag == true {
+					d.logger.Warnw("Serial port seems busy, notifying user",
+						"comPort", d.config.ConnectionInfo.COMPort)
 
-				d.notifier.Notify(fmt.Sprintf("Can't connect to %s!", d.config.ConnectionInfo.COMPort),
-					"This serial port is busy, make sure to close any serial monitor or other deej instance.")
-				flag = false
-				time.Sleep(30 * time.Second)
-				continue
+					d.notifier.Notify(fmt.Sprintf("Can't connect to %s!", d.config.ConnectionInfo.COMPort),
+						"This serial port is busy, make sure to close any serial monitor or other deej instance.")
+					flag = false
+					time.Sleep(30 * time.Second)
+					continue
 
-				//d.signalStop()
+					//d.signalStop()
 
 				// also notify if the COM port they gave isn't found, maybe their config is wrong
-			} else if errors.Is(err, os.ErrNotExist) && flag == true {
-				d.logger.Warnw("Provided COM port seems wrong, notifying user",
-					"comPort", d.config.ConnectionInfo.COMPort)
+				} else if errors.Is(err, os.ErrNotExist) && flag == true {
+					d.logger.Warnw("Provided COM port seems wrong, notifying user",
+						"comPort", d.config.ConnectionInfo.COMPort)
 
-				d.notifier.Notify(fmt.Sprintf("Can't connect to %s!", d.config.ConnectionInfo.COMPort),
-					"This serial port doesn't exist, check your configuration and make sure it's set correctly.")
-				flag = false
-				time.Sleep(30 * time.Second)
-				continue
+					d.notifier.Notify(fmt.Sprintf("Can't connect to %s!", d.config.ConnectionInfo.COMPort),
+						"This serial port doesn't exist, check your configuration and make sure it's set correctly.")
+					flag = false
+					time.Sleep(30 * time.Second)
+					continue
 
 				//d.signalStop()
-			}
-			time.Sleep(30 * time.Second)
-			continue
+				}
+				time.Sleep(30 * time.Second)
+				continue
 			}
 			d.logger.Info("Connect to %s", d.config.ConnectionInfo.COMPort)
 			d.notifier.Notify(fmt.Sprintf("The sound Mixer is connected"), "")
