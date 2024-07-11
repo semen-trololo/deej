@@ -15,7 +15,7 @@ void loop() {
   updateSliderValues();
   sendSliderValues(); // Actually send data (all the time)
   // printSliderValues(); // For debug
-  delay(10);
+  delay(15);
 }
 
 void updateSliderValues() {
